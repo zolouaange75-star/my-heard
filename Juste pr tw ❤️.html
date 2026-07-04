@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Une question importante ❤️</title>
 <style>
   :root{
@@ -28,15 +28,21 @@
     background: radial-gradient(ellipse at top, var(--navy-light) 0%, var(--navy-deep) 70%);
     color:var(--cream);
     overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
   }
 
   #app{
     position:relative;
     min-height:100vh;
+    min-height:100dvh; /* corrige la barre d'adresse Safari iOS qui rogne 100vh */
     display:flex;
     align-items:center;
     justify-content:center;
     padding:24px;
+    padding-top:max(24px, env(safe-area-inset-top));
+    padding-bottom:max(24px, env(safe-area-inset-bottom));
+    padding-left:max(24px, env(safe-area-inset-left));
+    padding-right:max(24px, env(safe-area-inset-right));
   }
 
   /* --- fond étoilé + coeurs flottants --- */
@@ -80,6 +86,7 @@
     padding:48px 36px;
     text-align:center;
     box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,111,156,0.08);
+    -webkit-backdrop-filter:blur(6px);
     backdrop-filter:blur(6px);
     animation:cardIn 0.7s cubic-bezier(.2,.9,.3,1.2);
   }
@@ -142,6 +149,10 @@
     padding:14px 30px;
     cursor:pointer;
     transition:transform 0.15s ease, box-shadow 0.2s ease;
+    -webkit-appearance:none;
+    appearance:none;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
   }
   button:hover{ transform:translateY(-2px); }
   button:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
@@ -212,7 +223,9 @@
     background:rgba(255,255,255,0.05);
     color:var(--cream);
     font-family:var(--font-body);
-    font-size:15px;
+    font-size:16px; /* évite le zoom auto de Safari iOS au focus (min 16px requis) */
+    -webkit-appearance:none;
+    appearance:none;
   }
   .question-block input:focus{
     outline:none;
@@ -260,9 +273,11 @@
     background:rgba(255,255,255,0.05);
     color:var(--cream);
     font-family:var(--font-body);
-    font-size:14px;
+    font-size:16px; /* évite le zoom auto de Safari iOS au focus */
     resize:vertical;
     margin-bottom:16px;
+    -webkit-appearance:none;
+    appearance:none;
   }
   textarea:focus{ outline:none; border-color:var(--pink); }
 
@@ -278,11 +293,51 @@
   .whatsapp-btn{
     display:inline-flex;
     align-items:center;
-    gap:10px;
-    background:#25D366;
-    color:white;
+    gap:12px;
+    background:linear-gradient(135deg, #2be07f, #1fae63);
+    color:#0a1128;
     font-weight:600;
-    margin-top:20px;
+    font-size:16px;
+    margin-top:24px;
+    padding:16px 34px;
+    border-radius:50px;
+    text-decoration:none;
+    box-shadow:
+      0 10px 30px rgba(37,211,102,0.35),
+      0 0 0 1px rgba(255,255,255,0.15) inset;
+    position:relative;
+    overflow:hidden;
+    animation:pulse-glow 2.4s ease-in-out infinite;
+  }
+  .whatsapp-btn svg{
+    width:22px;
+    height:22px;
+    fill:#0a1128;
+    flex-shrink:0;
+  }
+  .whatsapp-btn::before{
+    content:'';
+    position:absolute;
+    top:0; left:-75%;
+    width:50%; height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
+    transform:skewX(-20deg);
+    animation:shine 2.8s ease-in-out infinite;
+  }
+  .whatsapp-btn:hover{
+    transform:translateY(-3px) scale(1.03);
+    box-shadow:
+      0 14px 36px rgba(37,211,102,0.5),
+      0 0 0 1px rgba(255,255,255,0.2) inset;
+  }
+  @keyframes pulse-glow{
+    0%,100%{ box-shadow:0 10px 30px rgba(37,211,102,0.35), 0 0 0 1px rgba(255,255,255,0.15) inset; }
+    50%{ box-shadow:0 10px 40px rgba(37,211,102,0.65), 0 0 0 1px rgba(255,255,255,0.2) inset; }
+  }
+  @keyframes shine{
+    0%{ left:-75%; }
+    45%{ left:130%; }
+    100%{ left:130%; }
   }
 
   .days-counter{
@@ -325,7 +380,7 @@
   <!-- PAGE 1 : la question -->
   <section class="card" id="page-1">
     <div class="eyebrow">Question importante</div>
-    <h1>J'ai quelque chose à te demander Ma Ruthiii😻💗</h1>
+    <h1>J'ai quelque chose à te demander Mv❤️</h1>
     <div class="typewriter" id="typewriter-1"></div>
     <div class="btn-row">
       <button class="btn-yes" onclick="goTo('page-2')">Oui ❤️</button>
@@ -358,19 +413,19 @@
     <div style="margin-top:24px;">
       <div class="question-block">
         <label>Ton dessert préféré 🍰</label>
-        <input type="text" id="q-dessert" placeholder="Ex : fondant au chocolat">
+        <input type="text" id="q-dessert" placeholder="Ex : une glace à la vanille">
       </div>
       <div class="question-block">
         <label>Ton film préféré 🎬</label>
-        <input type="text" id="q-film" placeholder="Ex : La La Land">
+        <input type="text" id="q-film" placeholder="Ex : Avengers Endgame">
       </div>
       <div class="question-block">
         <label>Ta couleur préférée 🎨</label>
-        <input type="text" id="q-couleur" placeholder="Ex : rose poudré">
+        <input type="text" id="q-couleur" placeholder="Ex : rose ">
       </div>
       <div class="question-block">
         <label>Ta musique préférée 🎵</label>
-        <input type="text" id="q-musique" placeholder="Ex : une playlist romantique">
+        <input type="text" id="q-musique" placeholder="Ex : Longtemps - Amir">
       </div>
     </div>
     <button class="btn-yes" style="margin-top:10px;" onclick="showSummary()">Valider</button>
@@ -382,6 +437,7 @@
     <div class="eyebrow">Planification</div>
     <h1>Alors, on se voit quand ?</h1>
     <div class="options-col" id="options-col">
+      <button class="option-btn" data-value="Ce soir 🌙">Ce soir 🌙</button>
       <button class="option-btn" data-value="Ce week-end 🌹">Ce week-end 🌹</button>
       <button class="option-btn" data-value="La semaine prochaine ☕">La semaine prochaine ☕</button>
       <button class="option-btn" data-value="Quand tu veux ❤️">Quand tu veux ❤️</button>
@@ -408,7 +464,11 @@
       Maintenant, il ne reste plus qu'à organiser notre premier rendez-vous 😌
     </p>
     <a class="whatsapp-btn" id="whatsapp-link" href="https://wa.me/71660976" target="_blank" rel="noopener">
-      📱 M'écrire sur WhatsApp
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.472 14.382c-.297-.149-1.758-.868-2.03-.967-.273-.099-.471-.148-.67.15-.198.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.15-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#0a1128"/>
+        <path d="M12.004 2.003c-5.514 0-9.997 4.483-9.997 9.997 0 1.762.462 3.484 1.34 4.998L2 22l5.116-1.342a9.96 9.96 0 0 0 4.888 1.244h.004c5.514 0 9.997-4.483 9.997-9.997 0-2.671-1.04-5.182-2.929-7.071a9.935 9.935 0 0 0-7.072-2.83zm0 18.16h-.003a8.164 8.164 0 0 1-4.166-1.14l-.299-.177-3.037.797.81-2.96-.194-.304a8.145 8.145 0 0 1-1.256-4.38c0-4.508 3.67-8.178 8.19-8.178a8.13 8.13 0 0 1 5.786 2.397 8.113 8.113 0 0 1 2.397 5.784c-.003 4.509-3.673 8.161-8.228 8.161z" fill="#0a1128"/>
+      </svg>
+      <span>M'écrire sur WhatsApp</span>
     </a>
     <div class="days-counter" id="days-counter"></div>
   </section>
@@ -416,9 +476,12 @@
 </div>
 
 <script>
-
+/* ================= CONFIG À PERSONNALISER =================
+   - Remplace le numéro WhatsApp ci-dessous (format international, sans +, sans espace)
+   - Change la date de "depuis quand tu y penses" pour le compteur de jours
+=============================================================*/
 const WHATSAPP_NUMBER = "71660976"; // <-- remplace par ton numéro
-const THINKING_SINCE = new Date("2026-03-01"); // <-- remplace par ta date
+const THINKING_SINCE = new Date("2026-04-01"); // <-- remplace par ta date
 
 document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_NUMBER}`;
 
@@ -509,13 +572,22 @@ function setupFleeingButton(btn, counterEl){
     btn.textContent = messages[Math.floor(Math.random()*messages.length)];
   }
 
+  btn.style.touchAction = 'manipulation';
+  let touchHandled = false;
+
   btn.addEventListener('mouseenter', moveButton);
+
   btn.addEventListener('touchstart', function(e){
+    touchHandled = true;
     e.preventDefault();
     moveButton();
   }, {passive:false});
+
   btn.addEventListener('click', function(e){
-    e.preventDefault();
+    if(touchHandled){
+      touchHandled = false; // le touchstart a déjà géré le déplacement, on ignore le click fantôme d'iOS
+      return;
+    }
     moveButton();
   });
 }
