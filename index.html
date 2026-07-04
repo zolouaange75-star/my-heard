@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Une question importante ❤️</title>
+<style>
+  :root{
+    --navy-deep:#0a1128;
+    --navy:#16213e;
+    --navy-light:#1f2f52;
+    --pink:#ff6f9c;
+    --pink-soft:#ffc3d8;
+    --gold:#f2c14e;
+    --cream:#fdf6f0;
+    --text-soft:#c9d0e0;
+    --font-display:'Playfair Display', 'Georgia', serif;
+    --font-body:'Poppins', 'Segoe UI', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Poppins:wght@300;400;500;600&display=swap');
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    height:100%;
+    font-family:var(--font-body);
+    background: radial-gradient(ellipse at top, var(--navy-light) 0%, var(--navy-deep) 70%);
+    color:var(--cream);
+    overflow-x:hidden;
+  }
+
+  #app{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  /* --- fond étoilé + coeurs flottants --- */
+  #bg-hearts{
+    position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0;
+  }
+  .floating-heart{
+    position:absolute;
+    bottom:-40px;
+    color:var(--pink);
+    opacity:0.35;
+    font-size:20px;
+    animation:rise linear infinite;
+    user-select:none;
+  }
+  @keyframes rise{
+    to{ transform:translateY(-110vh) rotate(20deg); opacity:0; }
+  }
+
+  .star{
+    position:absolute;
+    background:white;
+    border-radius:50%;
+    opacity:0.6;
+    animation:twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity:0.15; }
+    50%{ opacity:0.8; }
+  }
+
+  /* --- carte principale --- */
+  .card{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:520px;
+    background:linear-gradient(160deg, rgba(31,47,82,0.9), rgba(10,17,40,0.95));
+    border:1px solid rgba(255,111,156,0.25);
+    border-radius:22px;
+    padding:48px 36px;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,111,156,0.08);
+    backdrop-filter:blur(6px);
+    animation:cardIn 0.7s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes cardIn{
+    from{ opacity:0; transform:translateY(30px) scale(0.96); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:14px;
+    font-weight:500;
+  }
+
+  h1, h2{
+    font-family:var(--font-display);
+    font-weight:700;
+    line-height:1.3;
+    margin-bottom:10px;
+  }
+  h1{ font-size:28px; color:var(--cream); }
+  h2{ font-size:22px; color:var(--pink-soft); font-style:italic; font-weight:600; }
+
+  .typewriter{
+    min-height:56px;
+    font-size:19px;
+    color:var(--text-soft);
+    margin:18px 0 28px;
+    font-family:var(--font-display);
+    font-style:italic;
+  }
+  .typewriter .cursor{
+    display:inline-block;
+    width:2px;
+    background:var(--pink);
+    margin-left:2px;
+    animation:blink 0.8s step-end infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .btn-row{
+    position:relative;
+    display:flex;
+    gap:18px;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    min-height:70px;
+  }
+
+  button{
+    font-family:var(--font-body);
+    font-weight:500;
+    font-size:16px;
+    border:none;
+    border-radius:50px;
+    padding:14px 30px;
+    cursor:pointer;
+    transition:transform 0.15s ease, box-shadow 0.2s ease;
+  }
+  button:hover{ transform:translateY(-2px); }
+  button:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+
+  .btn-yes{
+    background:linear-gradient(135deg, var(--pink), #ff4d7e);
+    color:white;
+    box-shadow:0 8px 24px rgba(255,111,156,0.4);
+  }
+  .btn-no{
+    background:transparent;
+    color:var(--text-soft);
+    border:1px solid rgba(255,255,255,0.25);
+    position:relative;
+  }
+  .btn-no.fleeing{
+    position:fixed;
+  }
+
+  .btn-secondary{
+    background:transparent;
+    color:var(--pink-soft);
+    border:1px solid rgba(255,111,156,0.4);
+  }
+  .btn-gold{
+    background:linear-gradient(135deg, var(--gold), #e0a52a);
+    color:var(--navy-deep);
+    font-weight:600;
+  }
+
+  .counter{
+    margin-top:22px;
+    font-size:13px;
+    color:rgba(255,255,255,0.4);
+  }
+
+  .hidden{ display:none !important; }
+
+  /* --- confettis / coeurs de célébration --- */
+  #celebration{
+    position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden;
+  }
+  .confetti, .falling-heart{
+    position:absolute;
+    top:-20px;
+    will-change:transform;
+  }
+  .confetti{ width:10px; height:10px; }
+  .falling-heart{ font-size:22px; }
+
+  /* --- questionnaire --- */
+  .question-block{
+    text-align:left;
+    margin-bottom:18px;
+  }
+  .question-block label{
+    display:block;
+    font-size:13px;
+    color:var(--gold);
+    margin-bottom:6px;
+    letter-spacing:0.5px;
+  }
+  .question-block input{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.05);
+    color:var(--cream);
+    font-family:var(--font-body);
+    font-size:15px;
+  }
+  .question-block input:focus{
+    outline:none;
+    border-color:var(--pink);
+  }
+
+  .summary-card{
+    text-align:left;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,111,156,0.2);
+    border-radius:14px;
+    padding:18px 20px;
+    margin:18px 0;
+    font-size:14px;
+    line-height:2;
+  }
+  .summary-card b{ color:var(--pink-soft); }
+
+  .options-col{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin:20px 0;
+  }
+  .option-btn{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.12);
+    color:var(--cream);
+    text-align:left;
+    border-radius:12px;
+    padding:16px 20px;
+    font-size:15px;
+  }
+  .option-btn:hover, .option-btn.selected{
+    border-color:var(--pink);
+    background:rgba(255,111,156,0.12);
+  }
+
+  textarea{
+    width:100%;
+    min-height:100px;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.05);
+    color:var(--cream);
+    font-family:var(--font-body);
+    font-size:14px;
+    resize:vertical;
+    margin-bottom:16px;
+  }
+  textarea:focus{ outline:none; border-color:var(--pink); }
+
+  .final-title{
+    font-size:32px;
+    background:linear-gradient(135deg, var(--pink), var(--gold));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    margin-bottom:14px;
+  }
+
+  .whatsapp-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background:#25D366;
+    color:white;
+    font-weight:600;
+    margin-top:20px;
+  }
+
+  .days-counter{
+    margin-top:24px;
+    font-size:13px;
+    color:rgba(255,255,255,0.45);
+    letter-spacing:0.4px;
+  }
+
+  .cursor-heart{
+    position:fixed;
+    pointer-events:none;
+    font-size:16px;
+    color:var(--pink);
+    z-index:9999;
+    opacity:0.8;
+    animation:fadeOutHeart 0.9s forwards;
+  }
+  @keyframes fadeOutHeart{
+    to{ transform:translateY(-40px) scale(0.5); opacity:0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+
+  @media (max-width:480px){
+    .card{ padding:34px 22px; }
+    h1{ font-size:23px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="bg-hearts"></div>
+<div id="celebration"></div>
+
+<div id="app">
+
+  <!-- PAGE 1 : la question -->
+  <section class="card" id="page-1">
+    <div class="eyebrow">Question importante</div>
+    <h1>J'ai quelque chose à te demander Ma Ruthiii😻💗</h1>
+    <div class="typewriter" id="typewriter-1"></div>
+    <div class="btn-row">
+      <button class="btn-yes" onclick="goTo('page-2')">Oui ❤️</button>
+      <button class="btn-no" id="btn-no">Non 😅</button>
+    </div>
+    <div class="counter">Tentatives pour cliquer sur "Non" : <span id="no-count">0</span> 😆</div>
+  </section>
+
+  <!-- PAGE 2 : confirmation -->
+  <section class="card hidden" id="page-2">
+    <div class="eyebrow">Confirmation</div>
+    <h1>Attends... tu as vraiment dit oui ? 😳</h1>
+    <div class="btn-row" style="margin-top:26px;">
+      <button class="btn-yes" onclick="goTo('page-3')">Oui, vraiment ❤️</button>
+      <button class="btn-no" id="btn-no-2">Je me suis trompée 😅</button>
+    </div>
+  </section>
+
+  <!-- PAGE 3 : réaction -->
+  <section class="card hidden" id="page-3">
+    <div class="final-title">Tu viens officiellement de<br>rendre quelqu'un très heureux ❤️</div>
+    <p style="color:var(--text-soft); margin-bottom:24px;">Merci d'avoir dit oui.</p>
+    <button class="btn-gold" onclick="goTo('page-4')">Continuer</button>
+  </section>
+
+  <!-- PAGE 4 : questionnaire -->
+  <section class="card hidden" id="page-4">
+    <div class="eyebrow">Un peu mieux</div>
+    <h1>Maintenant qu'on se connaît un peu mieux...</h1>
+    <div style="margin-top:24px;">
+      <div class="question-block">
+        <label>Ton dessert préféré 🍰</label>
+        <input type="text" id="q-dessert" placeholder="Ex : fondant au chocolat">
+      </div>
+      <div class="question-block">
+        <label>Ton film préféré 🎬</label>
+        <input type="text" id="q-film" placeholder="Ex : La La Land">
+      </div>
+      <div class="question-block">
+        <label>Ta couleur préférée 🎨</label>
+        <input type="text" id="q-couleur" placeholder="Ex : rose poudré">
+      </div>
+      <div class="question-block">
+        <label>Ta musique préférée 🎵</label>
+        <input type="text" id="q-musique" placeholder="Ex : une playlist romantique">
+      </div>
+    </div>
+    <button class="btn-yes" style="margin-top:10px;" onclick="showSummary()">Valider</button>
+    <div id="summary-container"></div>
+  </section>
+
+  <!-- PAGE 5 : planification -->
+  <section class="card hidden" id="page-5">
+    <div class="eyebrow">Planification</div>
+    <h1>Alors, on se voit quand ?</h1>
+    <div class="options-col" id="options-col">
+      <button class="option-btn" data-value="Ce week-end 🌹">Ce week-end 🌹</button>
+      <button class="option-btn" data-value="La semaine prochaine ☕">La semaine prochaine ☕</button>
+      <button class="option-btn" data-value="Quand tu veux ❤️">Quand tu veux ❤️</button>
+    </div>
+    <button class="btn-gold" onclick="goTo('page-6')">Continuer</button>
+  </section>
+
+  <!-- PAGE 6 : message personnel -->
+  <section class="card hidden" id="page-6">
+    <div class="eyebrow">Petit mot</div>
+    <h1>Un mot pour toi</h1>
+    <p style="color:var(--text-soft); margin:16px 0;" id="perso-message">
+      Depuis un moment, j'avais envie de te dire que j'aime passer du temps avec toi.
+      Merci d'avoir joué le jeu jusqu'ici ❤️
+    </p>
+    <textarea id="custom-message" placeholder="Modifie ce message si tu veux le personnaliser..."></textarea>
+    <button class="btn-yes" onclick="goTo('page-7')">Continuer</button>
+  </section>
+
+  <!-- PAGE 7 : fin -->
+  <section class="card hidden" id="page-7">
+    <div class="final-title">Mission accomplie ❤️</div>
+    <p style="color:var(--text-soft); margin-bottom:8px;">
+      Maintenant, il ne reste plus qu'à organiser notre premier rendez-vous 😌
+    </p>
+    <a class="whatsapp-btn" id="whatsapp-link" href="https://wa.me/71660976" target="_blank" rel="noopener">
+      📱 M'écrire sur WhatsApp
+    </a>
+    <div class="days-counter" id="days-counter"></div>
+  </section>
+
+</div>
+
+<script>
+
+const WHATSAPP_NUMBER = "71660976"; // <-- remplace par ton numéro
+const THINKING_SINCE = new Date("2026-03-01"); // <-- remplace par ta date
+
+document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_NUMBER}`;
+
+/* ---------- Navigation entre pages ---------- */
+function goTo(id){
+  document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  if(id === 'page-3') launchCelebration();
+  if(id === 'page-1') typeWriter('typewriter-1', "Réponds honnêtement... 👀", 0);
+  if(id === 'page-7') startDaysCounter();
+}
+
+/* ---------- Effet machine à écrire ---------- */
+function typeWriter(elId, text, delay){
+  const el = document.getElementById(elId);
+  el.innerHTML = '';
+  let i = 0;
+  const span = document.createElement('span');
+  el.appendChild(span);
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  cursor.style.height = '1em';
+  el.appendChild(cursor);
+
+  setTimeout(function type(){
+    if(i < text.length){
+      span.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, 45);
+    }
+  }, delay);
+}
+typeWriter('typewriter-1', "Réponds honnêtement... 👀", 300);
+
+/* ---------- Fond étoilé + coeurs flottants ---------- */
+const bg = document.getElementById('bg-hearts');
+for(let i=0;i<40;i++){
+  const star = document.createElement('div');
+  star.className = 'star';
+  const size = Math.random()*2 + 1;
+  star.style.width = size+'px';
+  star.style.height = size+'px';
+  star.style.left = Math.random()*100 + '%';
+  star.style.top = Math.random()*100 + '%';
+  star.style.animationDelay = Math.random()*3 + 's';
+  bg.appendChild(star);
+}
+for(let i=0;i<14;i++){
+  const h = document.createElement('div');
+  h.className = 'floating-heart';
+  h.textContent = ['❤','💗','💕'][Math.floor(Math.random()*3)];
+  h.style.left = Math.random()*100 + '%';
+  h.style.fontSize = (14 + Math.random()*14) + 'px';
+  h.style.animationDuration = (8 + Math.random()*10) + 's';
+  h.style.animationDelay = (Math.random()*10) + 's';
+  bg.appendChild(h);
+}
+
+/* ---------- Bouton "Non" qui fuit ---------- */
+function setupFleeingButton(btn, counterEl){
+  let attempts = 0;
+  let scale = 1;
+
+  function moveButton(){
+    const margin = 40;
+    const maxW = window.innerWidth - margin*2;
+    const maxH = window.innerHeight - margin*2;
+    const newX = margin + Math.random()*maxW;
+    const newY = margin + Math.random()*maxH;
+
+    btn.classList.add('fleeing');
+    btn.style.left = newX + 'px';
+    btn.style.top = newY + 'px';
+
+    attempts++;
+    if(counterEl) counterEl.textContent = attempts;
+
+    scale = Math.max(0.45, 1 - attempts*0.05);
+    btn.style.transform = `scale(${scale})`;
+
+    const messages = [
+      "Tu es sûre ? 🤔",
+      "Réfléchis encore 😅",
+      "Le bouton Oui est pourtant joli ❤️",
+      "Essaie encore... si tu oses 😏",
+      "Il fuit, il fuit ! 🏃‍♀️"
+    ];
+    btn.textContent = messages[Math.floor(Math.random()*messages.length)];
+  }
+
+  btn.addEventListener('mouseenter', moveButton);
+  btn.addEventListener('touchstart', function(e){
+    e.preventDefault();
+    moveButton();
+  }, {passive:false});
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    moveButton();
+  });
+}
+setupFleeingButton(document.getElementById('btn-no'), document.getElementById('no-count'));
+setupFleeingButton(document.getElementById('btn-no-2'), null);
+
+/* ---------- Confettis + coeurs qui tombent ---------- */
+function launchCelebration(){
+  const container = document.getElementById('celebration');
+  container.innerHTML = '';
+  const colors = ['#ff6f9c','#f2c14e','#ffc3d8','#ffffff','#ff4d7e'];
+
+  for(let i=0;i<60;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random()*100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.borderRadius = Math.random()>0.5 ? '50%' : '2px';
+    const duration = 3 + Math.random()*2.5;
+    c.animate([
+      { transform:'translateY(0) rotate(0deg)', opacity:1 },
+      { transform:`translateY(${window.innerHeight+50}px) rotate(${Math.random()*720}deg)`, opacity:0.9 }
+    ], { duration: duration*1000, easing:'ease-in', fill:'forwards' });
+    container.appendChild(c);
+    setTimeout(()=>c.remove(), duration*1000+100);
+  }
+
+  for(let i=0;i<25;i++){
+    const h = document.createElement('div');
+    h.className = 'falling-heart';
+    h.textContent = ['❤','💗','💕','💖'][Math.floor(Math.random()*4)];
+    h.style.left = Math.random()*100 + 'vw';
+    const duration = 3.5 + Math.random()*2.5;
+    h.animate([
+      { transform:'translateY(-20px) rotate(0deg)', opacity:1 },
+      { transform:`translateY(${window.innerHeight+50}px) rotate(${Math.random()*360-180}deg)`, opacity:0.8 }
+    ], { duration: duration*1000, easing:'ease-in', fill:'forwards' });
+    container.appendChild(h);
+    setTimeout(()=>h.remove(), duration*1000+100);
+  }
+}
+
+/* ---------- Questionnaire : résumé ---------- */
+function showSummary(){
+  const dessert = document.getElementById('q-dessert').value || '—';
+  const film = document.getElementById('q-film').value || '—';
+  const couleur = document.getElementById('q-couleur').value || '—';
+  const musique = document.getElementById('q-musique').value || '—';
+
+  const container = document.getElementById('summary-container');
+  container.innerHTML = `
+    <div class="summary-card">
+      🍰 <b>Dessert :</b> ${escapeHtml(dessert)}<br>
+      🎬 <b>Film :</b> ${escapeHtml(film)}<br>
+      🎨 <b>Couleur :</b> ${escapeHtml(couleur)}<br>
+      🎵 <b>Musique :</b> ${escapeHtml(musique)}
+    </div>
+    <button class="btn-gold" onclick="goTo('page-5')">Continuer</button>
+  `;
+}
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ---------- Choix du rendez-vous ---------- */
+document.querySelectorAll('.option-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+});
+
+/* ---------- Compteur de jours ---------- */
+function startDaysCounter(){
+  const el = document.getElementById('days-counter');
+  const now = new Date();
+  const diffDays = Math.max(0, Math.floor((now - THINKING_SINCE) / (1000*60*60*24)));
+  el.textContent = `Temps passé à penser à toi : ${diffDays} jours 😅`;
+}
+
+/* ---------- Petits coeurs qui suivent la souris ---------- */
+let lastHeartTime = 0;
+document.addEventListener('mousemove', (e)=>{
+  const now = Date.now();
+  if(now - lastHeartTime < 120) return;
+  lastHeartTime = now;
+  const heart = document.createElement('div');
+  heart.className = 'cursor-heart';
+  heart.textContent = '❤';
+  heart.style.left = (e.clientX - 8) + 'px';
+  heart.style.top = (e.clientY - 8) + 'px';
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(), 900);
+});
+</script>
+
+</body>
+</html>
